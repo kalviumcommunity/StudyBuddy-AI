@@ -24,7 +24,7 @@ exports.oneShot = async (req, res) => {
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // One-shot example + user question
+    // One-shot example +user question
     const prompt = `
 You are a study buddy AI. Answer questions simply.
 
