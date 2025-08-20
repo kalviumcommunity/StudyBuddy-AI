@@ -1,84 +1,64 @@
-#TravelGenie AI –  AI-Powered Trip Planner
+📘 Study Buddy AI – Your Personalized Learning Assistant
 
 🔍 Project Overview
-TravelGenie AI is a GenAI-powered assistant that helps users plan their dream vacation. Based on a user’s preferences (budget, destination type, dates, etc.), it recommends:
+Study Buddy AI is a GenAI-powered tutor that helps students learn faster and better. Based on a user’s chosen topic and difficulty level, it automatically generates:
 
--Travel destinations
+📘 Study Notes (concise and easy to understand)
 
--Activities and things to do
+📝 Quiz Questions (MCQs with multiple options)
 
--Estimated budget
+💡 Explanations (step-by-step, expandable answers)
 
--Places to stay
-
--A daily itinerary
-
-The system is enhanced with function calling to fetch real-time data (e.g., hotel suggestions) and uses RAG to pull travel insights from real blogs or guides.
+The project also demonstrates prompt engineering concepts (zero-shot, one-shot, multi-shot, dynamic prompting, chain-of-thought) and implements structured output, parameter tuning, function calling, and RAG to make the learning experience effective and user-friendly.
 
 
-------
+✅ How the Project Covers Required Concepts
+1. System Prompt & User Prompt (RTFC Framework)
 
-# ✅ How the Project Covers Required Concepts
+System Prompt: Defines the role, task, format, and constraints for the AI.
+User Prompt: Dynamic input provided by the user (topic + difficulty).
 
 
- ## 1. System Prompt & User Prompt
-✳️ System Prompt:
-The system prompt defines the role and behavior of the AI. For TravelGenie AI, it guides the model to behave like a friendly, reliable travel planner who gives realistic, practical vacation plans.
+2. Tuning Parameters
 
-Example:
-"You are a smart and experienced travel planner who provides personalized travel suggestions, activities, and accommodation ideas based on user preferences. Use reliable sources and always respond in a structured, helpful format."
+We fine-tune Gemini’s response behavior using parameters:
 
-This ensures the AI stays consistent and professional.
+Parameter	Value	Purpose
+Temperature	0.6	Adds mild creativity while keeping answers factual
+Max Tokens	500	Prevents overly long outputs
+Top-p	0.8	Ensures a balance between diverse and focused content
+Frequency Penalty	0.2	Reduces repetition in study notes
 
-✳️ User Prompt:
-The user prompt is what the user types — it guides what kind of vacation they want.
+This balance ensures the model is engaging, but accurate and concise.
+
+3. Structured Output
+
+Instead of free text, the AI outputs JSON format.
+
+This makes it easy to build UI cards, flashcards, and quizzes in the frontend.
+
+4. Function Calling
+
+We simulate function-calling by letting the AI decide when to call backend functions for extra tasks.
 
 Examples:
 
-“Plan a 5-day trip to a beach location under ₹50,000.”
+generateQuiz(topic, difficulty) → creates quiz MCQs
 
-“I want to go on a solo trip to the mountains in December.”
+summarizeNotes(topic, difficulty) → produces short notes
 
-“Suggest a romantic weekend getaway near Bangalore.”
+explainAnswer(question) → generates explanations
 
-The AI uses this input to create a custom travel plan.
-
-## 2. Tuning Parameters
-Tuning parameters are used to control how the model responds. These settings make sure TravelGenie is creative, but still useful and relevant.
-
-Parameter	   Value	       Meaning
-Temperature 	  0.6	    Adds mild creativity while staying useful
-Top-p	          0.85	    Allows broader choices in suggestions
-Frequency Penalty  0.3	    Prevents repeating the same activities or hotels
-Max Tokens	      600        Limits the length of the response to keep it concise
-
-This makes the assistant feel human-like, helpful, and clear in its replies.
-
- ## 3. Structured Output
-The AI's response is not just plain text. Instead, it returns structured data — like a list or JSON — which makes it easy to show in a UI or store in a database.This helps in making frontend cards, PDFs, or dashboards easily.
-
-## 4. Function Calling
-Function calling allows the AI to trigger specific backend tasks or APIs when it needs to fetch or perform actions beyond just answering.
-
-For TravelGenie AI, some example functions include:
-
-searchHotels(location, budget) → finds hotels in real-time
-
-getWeatherForecast(city, dates) → shows weather for planning
-
-generateItinerary(destination, days) → builds a full-day plan
-
-findNearbyAttractions(location) → lists activities near user
+This keeps the AI modular and extendable for future upgrades (like fetching PDFs or saving to database).
 
 
-## 5. RAG (Retrieval-Augmented Generation)
-RAG allows TravelGenie to pull real-world travel data from a custom dataset (like blogs or guides) and use it in the reply.
+5. RAG (Retrieval-Augmented Generation)
 
-How it works:
-User asks: “What are must-see places in Munnar?”
+RAG improves accuracy by pulling facts from custom knowledge bases (like textbooks, notes, or Wikipedia dumps).
+User asks: “Explain Newton’s Laws with real-life examples.”
 
-The system retrieves matching paragraphs from a travel blog stored in a database (like Pinecone or FAISS)
+System retrieves relevant passages (e.g., "An object in motion stays in motion...")
 
-These are passed into the LLM so it can give grounded, fact-based answers
+These are fed into Gemini → AI gives grounded answers with examples (car braking, pushing a box).
 
-This makes TravelGenie more accurate, personalized, and helpful, and prevents it from hallucinating fake travel advice.
+This prevents hallucination and ensures factual correctness.
