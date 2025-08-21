@@ -69,3 +69,36 @@ exports.systemPrompt=async (req, res) => {
   }
 
   };
+
+  //Multi-shot Prompt
+exports.multiShot = async (req, res) => {
+  try {
+    const { question } = req.body;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `
+You are a helpful study buddy that explains step by step.
+
+Example 1:
+Q: What is 12 + 7?
+A: 12 + 7 = 19.
+
+Example 2:
+Q: When did World War II end?
+A: 1945.
+
+Example 3:
+Q: What is gravity?
+A: It's the force that pulls objects toward the Earth.
+
+Now, answer this question:
+Q: ${question}
+`;
+   const result = await model.generateContent(prompt);
+    res.json({ response: result.response.text() });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error generating response" });
+  }
+};
