@@ -1,4 +1,4 @@
-// controllers/geminiController.js
+
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -44,3 +44,28 @@ Q: ${question}
     res.status(500).json({ message: "Error generating one-shot response" });
   }
 };
+
+//System &User Prompt
+exports.systemPrompt=async (req, res) => {
+  try {
+    const { userQuestion } = req.body;
+    
+    //System Prompt (role instruction)
+    const systemPrompt = "You are a Study Buddy AI. Explain concepts in a simple, clear way that a high school student can understand. Use short paragraphs, bullet points, and simple language.";
+    //User Prompt (actual question)
+    const finalPrompt=`${systemPrompt}\n\nUser Question: ${userQuestion}`;
+
+    const model=genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(finalPrompt);
+
+    res.json({
+      success:true,
+      question: userQuestion,
+      answer: result.response.text(),
+    });
+  }catch(error){
+    console.error("Error:",error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+
+  };
