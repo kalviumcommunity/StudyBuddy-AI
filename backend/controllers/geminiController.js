@@ -180,7 +180,7 @@ Question: ${question}
 `;
     const result = await model.generateContent(prompt);
 
-    // Simulate token count (replace with actual API token count if available)
+    // Simulate token count )
     const inputTokens = question.split(/\s+/).length + prompt.split(/\s+/).length; // Rough word-based count
     const outputTokens = result.response.text().split(/\s+/).length; // Rough word-based count
     const totalTokens = inputTokens + outputTokens;
