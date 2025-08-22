@@ -102,3 +102,34 @@ Q: ${question}
     res.status(500).json({ message: "Error generating response" });
   }
 };
+
+// Dynamic Prompting
+exports.dynamicPrompt = async (req, res) => {
+  try {
+    const { topic, difficulty } = req.body;
+
+    if (!topic || !difficulty) {
+      return res.status(400).json({ message: "Topic and difficulty are required" });
+    }
+
+    // Dynamically build the prompt based on difficulty
+    let prompt = `You are a Study Buddy AI. Explain the concept of ${topic}`;
+    
+    if (difficulty.toLowerCase() === 'easy') {
+      prompt += ' in very simple terms, like teaching a beginner high school student. Use short sentences and everyday examples.';
+    } else if (difficulty.toLowerCase() === 'medium') {
+      prompt += ' with moderate details, suitable for someone with basic knowledge. Include key steps and one or two examples.';
+    } else if (difficulty.toLowerCase() === 'hard') {
+      prompt += ' in depth, for advanced learners. Cover technical details, formulas if applicable, and real-world applications.';
+    } else {
+      return res.status(400).json({ message: "Invalid difficulty level. Use 'easy', 'medium', or 'hard'." });
+    }
+
+    const result = await model.generateContent(prompt);
+
+    res.json({ response: result.response.text() });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error generating dynamic response" });
+  }
+};
