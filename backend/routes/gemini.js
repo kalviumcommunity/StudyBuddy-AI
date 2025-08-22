@@ -1,5 +1,5 @@
 const express = require("express");
-const { zeroShot, oneShot, systemPrompt, multiShot, dynamicPrompt, chainOfThought } = require("../controllers/geminiController");
+const { zeroShot, oneShot, systemPrompt, multiShot, dynamicPrompt, chainOfThought, tokensAndTokenization } = require("../controllers/geminiController");
 const router = express.Router();
 
 router.post("/zero-shot", zeroShot);
@@ -13,5 +13,7 @@ router.post("/multi-shot",multiShot);
 router.post("/dynamic", dynamicPrompt);
 
 router.post("/chain-of-thought", chainOfThought);
+
+router.post("/tokens", tokensAndTokenization);
 
 module.exports = router;

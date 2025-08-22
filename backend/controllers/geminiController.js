@@ -164,3 +164,38 @@ Begin your response with 'Step 1:' and end with 'Final Answer:'.
     res.status(500).json({ message: "Error generating chain of thought response" });
   }
 };
+
+// Tokens and Tokenization
+exports.tokensAndTokenization = async (req, res) => {
+  try {
+    const { question } = req.body;
+
+    if (!question) {
+      return res.status(400).json({ message: "Question is required" });
+    }
+
+    const prompt = `You are a Study Buddy AI. Answer the following question.
+
+Question: ${question}
+`;
+    const result = await model.generateContent(prompt);
+
+    // Simulate token count (replace with actual API token count if available)
+    const inputTokens = question.split(/\s+/).length + prompt.split(/\s+/).length; // Rough word-based count
+    const outputTokens = result.response.text().split(/\s+/).length; // Rough word-based count
+    const totalTokens = inputTokens + outputTokens;
+
+    res.json({
+      question: question,
+      response: result.response.text(),
+      tokenDetails: {
+        inputTokens: inputTokens,
+        outputTokens: outputTokens,
+        totalTokens: totalTokens,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error processing tokens and tokenization" });
+  }
+};
