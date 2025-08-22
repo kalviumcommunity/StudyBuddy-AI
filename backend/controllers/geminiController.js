@@ -133,3 +133,34 @@ exports.dynamicPrompt = async (req, res) => {
     res.status(500).json({ message: "Error generating dynamic response" });
   }
 };
+
+// Chain of Thought Prompting
+exports.chainOfThought = async (req, res) => {
+  try {
+    const { question } = req.body;
+
+    if (!question) {
+      return res.status(400).json({ message: "Question is required" });
+    }
+
+    const prompt = `
+You are a Study Buddy AI. Solve the following question step by step, showing your reasoning process clearly before giving the final answer.
+
+Question: ${question}
+
+Instructions:
+- Break down the problem into logical steps.
+- Explain each step in simple language.
+- Provide the final answer at the end.
+
+Begin your response with 'Step 1:' and end with 'Final Answer:'.
+`;
+
+    const result = await model.generateContent(prompt);
+
+    res.json({ response: result.response.text() });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error generating chain of thought response" });
+  }
+};
