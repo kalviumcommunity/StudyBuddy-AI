@@ -9,9 +9,10 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: ['https://yourstudymateaai.netlify.app/'],
+  origin: true,
   credentials: true
 }));
+
 
 // MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
