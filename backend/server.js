@@ -12,7 +12,6 @@ app.use(cors({
   origin: ['https://yourstudymateaai.netlify.app/'],
   credentials: true
 }));
-const dotenv = require("dotenv");
 
 // MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
