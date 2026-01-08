@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://your-frontend-url.vercel.app'],
+  origin: ['http://localhost:3000', 'https://yourstudymateaai.netlify.app/'],
   credentials: true
 }));
 const dotenv = require("dotenv");
