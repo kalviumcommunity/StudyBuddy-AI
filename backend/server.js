@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-
+const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
@@ -12,7 +12,7 @@ app.use(cors({
   origin: ['https://yourstudymateaai.netlify.app/'],
   credentials: true
 }));
-const dotenv = require("dotenv");
+
 
 // MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
