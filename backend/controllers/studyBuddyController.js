@@ -3,6 +3,94 @@ require("dotenv").config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.0-flash",
+});
+
+/* =========================
+   ASK QUESTION
+========================= */
+exports.askQuestion = async (req, res) => {
+  try {
+    const { question } = req.body;
+
+    if (!question) {
+      return res.status(400).json({ error: "Question required" });
+    }
+
+    const result = await model.generateContent(question);
+    const response = result.response.text();
+
+    res.status(200).json({ answer: response });
+
+  } catch (err) {
+    console.error("Ask Error:", err);
+    res.status(500).json({ error: "Gemini failed" });
+  }
+};
+
+/* =========================
+   QUIZ GENERATION
+========================= */
+exports.generateQuiz = async (req, res) => {
+  try {
+    const { topic } = req.body;
+
+    if (!topic) {
+      return res.status(400).json({ error: "Topic required" });
+    }
+
+    const prompt = `
+Create a 5-question multiple-choice quiz on "${topic}".
+
+Return ONLY valid JSON in this format:
+{
+  "quiz": [
+    {
+      "question": "Question text?",
+      "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+      "answer": "A"
+    }
+  ]
+}`;
+
+    const result = await model.generateContent(prompt);
+    let text = result.response.text().trim();
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    
+    const data = JSON.parse(text);
+    res.status(200).json(data);
+
+  } catch (err) {
+    console.error("Quiz Error:", err);
+    res.status(500).json({ error: "Failed to generate quiz" });
+  }
+};
+
+/* =========================
+   SUMMARY GENERATION
+========================= */
+exports.generateSummary = async (req, res) => {
+  try {
+    const { topic } = req.body;
+
+    if (!topic) {
+      return res.status(400).json({ error: "Topic required" });
+    }
+
+    const prompt = `Provide a concise, easy-to-understand summary of "${topic}" in 200-300 words. Focus on key concepts and important details.`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
+
+    res.status(200).json({ summary: response });
+
+  } catch (err) {
+    console.error("Summary Error:", err);
+    res.status(500).json({ error: "Failed to generate summary" });
+  }
+};
+
 // ========================================
 // 1. GENERATE STUDY NOTES (Structured Output)
 // ========================================

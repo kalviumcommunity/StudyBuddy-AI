@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: ['https://yourstudymateaai.netlify.app/'],
+  origin: 'https://yourstudymateaai.netlify.app',
   credentials: true
 }));
 
