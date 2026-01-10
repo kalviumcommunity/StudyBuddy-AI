@@ -1,19 +1,14 @@
 const express = require("express");
-const { zeroShot, oneShot, systemPrompt, multiShot, dynamicPrompt, chainOfThought, tokensAndTokenization } = require("../controllers/geminiController");
 const router = express.Router();
 
-router.post("/zero-shot", zeroShot);
+const {
+  askQuestion,
+  generateQuiz,
+  generateSummary,
+} = require("../controllers/studyBuddyController");
 
-router.post("/one-shot", oneShot); 
-
-router.post("/system-user", systemPrompt);
-
-router.post("/multi-shot",multiShot);
-
-router.post("/dynamic", dynamicPrompt);
-
-router.post("/chain-of-thought", chainOfThought);
-
-router.post("/tokens", tokensAndTokenization);
+router.post("/ask", askQuestion);
+router.post("/quiz", generateQuiz);
+router.post("/summary", generateSummary);
 
 module.exports = router;
