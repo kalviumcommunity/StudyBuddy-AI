@@ -1,30 +1,36 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
-const dotenv = require("dotenv");
-dotenv.config();
+require("dotenv").config(); // dotenv setup
 
 const app = express();
-app.use(express.json());
 
+// CORS setup
+// If you want to allow only your frontend:
 app.use(cors({
   origin: ['https://yourstudymateaai.netlify.app/'],
   credentials: true
 }));
+// To allow all origins, just use: app.use(cors());
 
+// Parse JSON requests
+app.use(express.json());
 
-// MongoDB connect
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ MongoDB Error:", err.message));
 
-const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
-const geminiRoutes = require("./routes/gemini");
-app.use("/api/gemini", geminiRoutes);
+// Test route
+app.get("/", (req, res) => {
+  res.json({ message: "StudyBuddy API running" });
+});
 
+// Routes
+app.use("/gemini", require("./routes/gemini"));
 
-
+// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on: http://localhost:${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
+);

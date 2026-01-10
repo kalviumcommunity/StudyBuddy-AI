@@ -20,7 +20,6 @@
       flex-direction: column;
     }
 
-    /* Top Navigation Bar */
     .navbar {
       background: white;
       padding: 15px 30px;
@@ -31,19 +30,10 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
-    .navbar-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
     .logo {
       font-size: 24px;
       font-weight: 700;
       color: #5b7dff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .status {
@@ -55,122 +45,6 @@
       font-weight: 600;
     }
 
-    .navbar-right {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .user-email {
-      color: #5b7dff;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .btn {
-      padding: 10px 24px;
-      background: #5b7dff;
-      border: none;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .btn:hover {
-      background: #4a6eeb;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(91, 125, 255, 0.3);
-    }
-
-    .btn-logout {
-      background: #ff6b6b;
-    }
-
-    .btn-logout:hover {
-      background: #ff5252;
-    }
-
-    /* Login Modal */
-    .login-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .login-box {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      width: 420px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    }
-
-    .login-box h2 {
-      color: #2c3e50;
-      margin-bottom: 24px;
-      text-align: center;
-      font-size: 28px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: #5b7dff;
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 12px 16px;
-      background: #f8f9fb;
-      border: 2px solid #e8eef5;
-      border-radius: 8px;
-      color: #2c3e50;
-      font-size: 14px;
-      transition: all 0.3s;
-    }
-
-    .input-group input:focus {
-      outline: none;
-      border-color: #5b7dff;
-      background: white;
-    }
-
-    .login-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 25px;
-    }
-
-    .login-buttons .btn {
-      flex: 1;
-      padding: 14px;
-    }
-
-    .auth-message {
-      margin-top: 15px;
-      text-align: center;
-      font-size: 13px;
-    }
-
-    /* Chat Container */
     .chat-container {
       flex: 1;
       display: flex;
@@ -224,7 +98,6 @@
       color: #5b7dff;
     }
 
-    /* Chat Messages */
     .messages {
       flex: 1;
       overflow-y: auto;
@@ -296,7 +169,6 @@
       color: #2c3e50;
     }
 
-    /* Input Area */
     .input-area {
       display: flex;
       gap: 12px;
@@ -323,9 +195,22 @@
       background: white;
     }
 
-    .input-area button {
+    .btn {
       padding: 14px 32px;
+      background: #5b7dff;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
       font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background: #4a6eeb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(91, 125, 255, 0.3);
     }
 
     .typing {
@@ -337,67 +222,39 @@
       display: none;
     }
 
-    .success {
-      color: #2e7d32;
-      font-weight: 600;
+    .quiz-question {
+      background: #f8f9fb;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #5b7dff;
     }
 
-    .error {
-      color: #d32f2f;
-      font-weight: 600;
+    .quiz-option {
+      padding: 8px 12px;
+      margin: 5px 0;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #e8eef5;
     }
   </style>
 </head>
 <body>
-  <!-- Navigation Bar -->
   <div class="navbar">
-    <div class="navbar-left">
-      <div class="logo">🎓 StudyBuddy AI</div>
-      <div class="status" id="status">● Offline</div>
-    </div>
-    <div class="navbar-right hidden" id="userInfo">
-      <span class="user-email" id="userEmail"></span>
-      <button class="btn btn-logout" onclick="logout()">Logout</button>
-    </div>
+    <div class="logo">🎓 StudyBuddy AI</div>
+    <div class="status">● Ready</div>
   </div>
 
-  <!-- Login Modal -->
-  <div class="login-modal" id="loginModal">
-    <div class="login-box">
-      <h2>Welcome to StudyBuddy</h2>
-      <div class="input-group">
-        <label>Name (for signup)</label>
-        <input type="text" id="authName" placeholder="Your name">
-      </div>
-      <div class="input-group">
-        <label>Email</label>
-        <input type="email" id="authEmail" placeholder="you@example.com">
-      </div>
-      <div class="input-group">
-        <label>Password</label>
-        <input type="password" id="authPassword" placeholder="••••••••">
-      </div>
-      <div class="login-buttons">
-        <button class="btn" onclick="signup()">Sign Up</button>
-        <button class="btn" onclick="login()">Login</button>
-      </div>
-      <div class="auth-message" id="authMessage"></div>
-    </div>
-  </div>
-
-  <!-- Chat Container -->
   <div class="chat-container">
     <div class="welcome-screen" id="welcomeScreen">
       <h1>🎓 StudyBuddy AI</h1>
       <p>Your personal AI learning assistant</p>
       <div class="welcome-commands">
         <h3 style="margin-bottom: 16px; color: #2c3e50;">Available Commands:</h3>
-        <div class="command"><strong>/notes</strong> photosynthesis easy - Generate study notes</div>
-        <div class="command"><strong>/quiz</strong> physics medium - Create a practice quiz</div>
-        <div class="command"><strong>/explain</strong> how does gravity work - Get detailed explanations</div>
-        <div class="command"><strong>/ask</strong> what is photosynthesis - Ask any question</div>
-        <div class="command"><strong>/session</strong> chemistry hard - Complete study session</div>
+        <div class="command"><strong>/quiz</strong> [topic] - Generate a quiz (e.g., /quiz physics)</div>
+        <div class="command"><strong>/summary</strong> [topic] - Get topic summary (e.g., /summary gravity)</div>
         <div class="command"><strong>/help</strong> - Show all commands</div>
+        <div class="command">Or just <strong>ask any question directly!</strong></div>
       </div>
     </div>
 
@@ -407,7 +264,7 @@
       <input 
         type="text" 
         id="userInput" 
-        placeholder="Type a command... (e.g., /notes photosynthesis easy)"
+        placeholder="Ask a question or type a command..."
         onkeypress="if(event.key === 'Enter') sendMessage()"
       >
       <button class="btn" onclick="sendMessage()">Send</button>
@@ -415,83 +272,17 @@
   </div>
 
   <script>
-    const API_URL = 'https://studybuddy-ai-1-ymfx.onrender.com';
-    let token = localStorage.getItem('token');
-    let userEmail = localStorage.getItem('email');
-
-    window.onload = function() {
-      if (token) {
-        hideLoginModal();
-      }
-    };
-
-    function hideLoginModal() {
-      document.getElementById('loginModal').classList.add('hidden');
-      document.getElementById('status').textContent = '● Online';
-      document.getElementById('userInfo').classList.remove('hidden');
-      document.getElementById('userEmail').textContent = userEmail;
-      document.getElementById('messages').classList.remove('hidden');
-      document.getElementById('welcomeScreen').classList.add('hidden');
-      addMessage('ai', 'Hi! I\'m StudyBuddy AI. Type /help to see what I can do for you.');
-    }
-
-    async function signup() {
-      const name = document.getElementById('authName').value;
-      const email = document.getElementById('authEmail').value;
-      const password = document.getElementById('authPassword').value;
-
-      try {
-        const res = await fetch(`${API_URL}/api/auth/signup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
-        });
-        const data = await res.json();
-        document.getElementById('authMessage').innerHTML = 
-          `<span class="success">✓ ${data.message} Now login!</span>`;
-      } catch (error) {
-        document.getElementById('authMessage').innerHTML = 
-          `<span class="error">✗ Signup failed</span>`;
-      }
-    }
-
-    async function login() {
-      const email = document.getElementById('authEmail').value;
-      const password = document.getElementById('authPassword').value;
-
-      try {
-        const res = await fetch(`${API_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        
-        if (data.token) {
-          token = data.token;
-          userEmail = data.email;
-          localStorage.setItem('token', token);
-          localStorage.setItem('email', email);
-          hideLoginModal();
-        } else {
-          document.getElementById('authMessage').innerHTML = 
-            `<span class="error">✗ Invalid credentials</span>`;
-        }
-      } catch (error) {
-        document.getElementById('authMessage').innerHTML = 
-          `<span class="error">✗ Login failed</span>`;
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('email');
-      token = null;
-      location.reload();
-    }
+    const API_URL = 'http://localhost:5000/gemini';
 
     function addMessage(sender, content) {
+      const welcomeScreen = document.getElementById('welcomeScreen');
       const messagesDiv = document.getElementById('messages');
+      
+      if (!welcomeScreen.classList.contains('hidden')) {
+        welcomeScreen.classList.add('hidden');
+        messagesDiv.classList.remove('hidden');
+      }
+      
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${sender}`;
       
@@ -508,7 +299,14 @@
     }
 
     function showTyping() {
+      const welcomeScreen = document.getElementById('welcomeScreen');
       const messagesDiv = document.getElementById('messages');
+      
+      if (!welcomeScreen.classList.contains('hidden')) {
+        welcomeScreen.classList.add('hidden');
+        messagesDiv.classList.remove('hidden');
+      }
+      
       const typingDiv = document.createElement('div');
       typingDiv.className = 'message ai typing';
       typingDiv.id = 'typing';
@@ -540,22 +338,14 @@
       if (command === '/help') {
         const helpText = `Available Commands:
 
-/notes [topic] [difficulty] - Generate study notes
-   Example: /notes photosynthesis easy
+/quiz [topic] - Generate a 5-question quiz
+   Example: /quiz photosynthesis
 
-/quiz [topic] [difficulty] - Create a practice quiz
-   Example: /quiz physics medium
+/summary [topic] - Get a concise explanation
+   Example: /summary Newton's laws
 
-/explain [question] - Get detailed explanation
-   Example: /explain how does gravity work
-
-/ask [question] - Ask anything (uses knowledge base)
-   Example: /ask what is photosynthesis
-
-/session [topic] [difficulty] - Complete study session
-   Example: /session chemistry hard
-
-Difficulty levels: easy, medium, hard`;
+Or just ask any question directly!
+   Example: What is gravity?`;
         addMessage('ai', helpText);
         return;
       }
@@ -563,19 +353,13 @@ Difficulty levels: easy, medium, hard`;
       showTyping();
       
       try {
-        if (command === '/notes') {
-          await handleNotes(parts.slice(1));
-        } else if (command === '/quiz') {
-          await handleQuiz(parts.slice(1));
-        } else if (command === '/explain') {
-          await handleExplain(parts.slice(1).join(' '));
-        } else if (command === '/ask') {
-          await handleAsk(parts.slice(1).join(' '));
-        } else if (command === '/session') {
-          await handleSession(parts.slice(1));
+        if (command === '/quiz') {
+          await handleQuiz(parts.slice(1).join(' '));
+        } else if (command === '/summary') {
+          await handleSummary(parts.slice(1).join(' '));
         } else {
-          hideTyping();
-          addMessage('ai', '❌ Unknown command. Type /help to see available commands.');
+          // Regular question
+          await handleQuestion(message);
         }
       } catch (error) {
         hideTyping();
@@ -583,152 +367,92 @@ Difficulty levels: easy, medium, hard`;
       }
     }
 
-    async function handleNotes(args) {
-      const difficulty = args.pop();
-      const topic = args.join(' ');
-      
-      const res = await fetch(`${API_URL}/gemini/study-notes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ topic, difficulty })
-      });
-      
-      const data = await res.json();
-      hideTyping();
-      
-      if (data.success) {
-        const notes = data.notes;
-        const output = `📘 ${notes.title}
-
-${notes.summary}
-
-Key Points:
-${notes.keyPoints.map(p => `• ${p}`).join('\n')}
-
-Examples:
-${notes.examples.map(e => `📌 ${e}`).join('\n')}`;
-        addMessage('ai', output);
-      } else {
-        addMessage('ai', '❌ Failed to generate notes');
-      }
-    }
-
-    async function handleQuiz(args) {
-      const difficulty = args.pop();
-      const topic = args.join(' ');
-      
-      const res = await fetch(`${API_URL}/gemini/quiz`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ topic, difficulty, numQuestions: 3 })
-      });
-      
-      const data = await res.json();
-      hideTyping();
-      
-      if (data.success) {
-        let output = '📝 Practice Quiz\n\n';
-        data.quiz.forEach((q, i) => {
-          output += `Question ${i+1}: ${q.question}\n`;
-          output += q.options.join('\n') + '\n';
-          output += `\n✓ Answer: ${q.correctAnswer}\n`;
-          output += `💡 ${q.explanation}\n\n`;
+    async function handleQuestion(question) {
+      try {
+        const res = await fetch(`${API_URL}/ask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
         });
-        addMessage('ai', output);
-      } else {
-        addMessage('ai', '❌ Failed to generate quiz');
-      }
-    }
-
-    async function handleExplain(question) {
-      const res = await fetch(`${API_URL}/gemini/explain`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ question })
-      });
-      
-      const data = await res.json();
-      hideTyping();
-      
-      if (data.success) {
-        addMessage('ai', data.explanation);
-      } else {
-        addMessage('ai', '❌ Failed to generate explanation');
-      }
-    }
-
-    async function handleAsk(question) {
-      const res = await fetch(`${API_URL}/gemini/rag`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ question })
-      });
-      
-      const data = await res.json();
-      hideTyping();
-      
-      if (data.success) {
-        let output = data.answer;
-        if (data.sources.length > 0) {
-          output += `\n\n📚 Sources: ${data.sources.map(s => s.topic).join(', ')}`;
+        
+        const data = await res.json();
+        hideTyping();
+        
+        if (data.answer) {
+          addMessage('ai', data.answer);
+        } else {
+          addMessage('ai', '❌ Failed to get answer');
         }
-        addMessage('ai', output);
-      } else {
-        addMessage('ai', '❌ Failed to get answer');
+      } catch (error) {
+        hideTyping();
+        addMessage('ai', '❌ Connection error. Make sure backend is running!');
       }
     }
 
-    async function handleSession(args) {
-      const difficulty = args.pop();
-      const topic = args.join(' ');
+    async function handleQuiz(topic) {
+      if (!topic) {
+        hideTyping();
+        addMessage('ai', '❌ Please specify a topic. Example: /quiz physics');
+        return;
+      }
       
-      const res = await fetch(`${API_URL}/gemini/study-session`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ topic, difficulty })
-      });
-      
-      const data = await res.json();
-      hideTyping();
-      
-      if (data.success) {
-        const s = data.session;
-        let output = `🎯 Complete Study Session
-
-📘 ${s.notes.title}
-${s.notes.summary}
-
-Key Points:
-${s.notes.keyPoints.map(p => `• ${p}`).join('\n')}
-
-📝 Practice Quiz:
-${s.quiz.map((q, i) => `
-${i+1}. ${q.question}
-${q.options.join('\n')}
-✓ ${q.correctAnswer}`).join('\n\n')}
-
-💡 Study Tips:
-${s.studyTips.map(t => `• ${t}`).join('\n')}`;
-        addMessage('ai', output);
-      } else {
-        addMessage('ai', '❌ Failed to create session');
+      try {
+        const res = await fetch(`${API_URL}/quiz`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic })
+        });
+        
+        const data = await res.json();
+        hideTyping();
+        
+        if (data.quiz && data.quiz.length > 0) {
+          let output = `📝 Quiz: ${topic}\n\n`;
+          data.quiz.forEach((q, i) => {
+            output += `Question ${i+1}: ${q.question}\n`;
+            q.options.forEach((opt, j) => {
+              output += `${String.fromCharCode(65+j)}) ${opt}\n`;
+            });
+            output += `\n✓ Answer: ${q.answer}\n\n`;
+          });
+          addMessage('ai', output);
+        } else {
+          addMessage('ai', '❌ Failed to generate quiz');
+        }
+      } catch (error) {
+        hideTyping();
+        addMessage('ai', '❌ Connection error. Make sure backend is running!');
       }
     }
+
+    async function handleSummary(topic) {
+      if (!topic) {
+        hideTyping();
+        addMessage('ai', '❌ Please specify a topic. Example: /summary gravity');
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${API_URL}/summary`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic })
+        });
+        
+        const data = await res.json();
+        hideTyping();
+        
+        if (data.summary) {
+          addMessage('ai', `📘 Summary: ${topic}\n\n${data.summary}`);
+        } else {
+          addMessage('ai', '❌ Failed to generate summary');
+        }
+      } catch (error) {
+        hideTyping();
+        addMessage('ai', '❌ Connection error. Make sure backend is running!');
+      }
+    }
+     window.onload = () => document.getElementById("userInput").focus();
   </script>
 </body>
 </html>
