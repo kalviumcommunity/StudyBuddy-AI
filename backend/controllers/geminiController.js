@@ -10,7 +10,7 @@ const {
   explainAnswer,
   ragQuery,
   createStudySession
-} = require("../controllers/groqController");
+} = require("../controllers/studyBuddyController");
 
 // Import old Gemini controller for demo routes (optional)
 const { 
