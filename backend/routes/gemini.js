@@ -1,26 +1,24 @@
 const express = require("express");
-const { zeroShot, oneShot, systemPrompt, multiShot, dynamicPrompt, chainOfThought, tokensAndTokenization } = require("../controllers/geminiController");
-const { askQuestion, generateQuiz, generateSummary } = require("../controllers/studyBuddyController");
+const { 
+  askQuestion, 
+  generateQuiz, 
+  generateSummary,
+  generateStudyNotes,
+  explainAnswer,
+  ragQuery,
+  createStudySession
+} = require("../controllers/studyBuddyController");
 const router = express.Router();
 
 // Frontend routes
 router.post("/ask", askQuestion);
 router.post("/quiz", generateQuiz);
 router.post("/summary", generateSummary);
+router.post("/study-notes", generateStudyNotes);
+router.post("/explain", explainAnswer);
+router.post("/rag", ragQuery);
+router.post("/study-session", createStudySession);
 
-// Existing routes
-router.post("/zero-shot", zeroShot);
 
-router.post("/one-shot", oneShot); 
-
-router.post("/system-user", systemPrompt);
-
-router.post("/multi-shot",multiShot);
-
-router.post("/dynamic", dynamicPrompt);
-
-router.post("/chain-of-thought", chainOfThought);
-
-router.post("/tokens", tokensAndTokenization);
 
 module.exports = router;
