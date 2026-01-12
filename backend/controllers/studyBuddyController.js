@@ -1,15 +1,16 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const Groq = require("groq-sdk");
 require("dotenv").config();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
+const groq = new Groq({ 
+  apiKey: process.env.GROQ_API_KEY 
 });
 
-/* =========================
-   ASK QUESTION
-========================= */
+// Best models: llama3-70b-8192 (smartest) or llama3-8b-8192 (fastest)
+const MODEL = "llama-3.3-70b-versatile";
+
+// ========================================
+// ASK QUESTION
+// ========================================
 exports.askQuestion = async (req, res) => {
   try {
     const { question } = req.body;
@@ -18,20 +19,38 @@ exports.askQuestion = async (req, res) => {
       return res.status(400).json({ error: "Question required" });
     }
 
-    const result = await model.generateContent(question);
-    const response = result.response.text();
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful study assistant. Provide clear, concise, and accurate answers to help students learn."
+        },
+        {
+          role: "user",
+          content: question
+        }
+      ],
+      model: MODEL,
+      temperature: 0.7,
+      max_tokens: 1000,
+      top_p: 0.9
+    });
 
-    res.status(200).json({ answer: response });
+    const answer = completion.choices[0].message.content;
+
+    res.status(200).json({ answer });
 
   } catch (err) {
     console.error("Ask Error:", err);
-    res.status(500).json({ error: "Gemini failed" });
+    res.status(500).json({ 
+      error: "Failed to get answer: " + err.message 
+    });
   }
 };
 
-/* =========================
-   QUIZ GENERATION
-========================= */
+// ========================================
+// QUIZ GENERATION
+// ========================================
 exports.generateQuiz = async (req, res) => {
   try {
     const { topic } = req.body;
@@ -40,36 +59,54 @@ exports.generateQuiz = async (req, res) => {
       return res.status(400).json({ error: "Topic required" });
     }
 
-    const prompt = `
-Create a 5-question multiple-choice quiz on "${topic}".
+    const prompt = `Create a 5-question multiple-choice quiz on "${topic}".
 
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON in this exact format (no markdown, no extra text):
 {
   "quiz": [
     {
       "question": "Question text?",
-      "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+      "options": ["option1", "option2", "option3", "option4"],
       "answer": "A"
     }
   ]
 }`;
 
-    const result = await model.generateContent(prompt);
-    let text = result.response.text().trim();
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a quiz generator. Always respond with valid JSON only, no markdown formatting."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: MODEL,
+      temperature: 0.8,
+      max_tokens: 2000,
+      response_format: { type: "json_object" }
+    });
+
+    let text = completion.choices[0].message.content.trim();
     text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
     
     const data = JSON.parse(text);
+    
     res.status(200).json(data);
 
   } catch (err) {
     console.error("Quiz Error:", err);
-    res.status(500).json({ error: "Failed to generate quiz" });
+    res.status(500).json({ 
+      error: "Failed to generate quiz: " + err.message 
+    });
   }
 };
 
-/* =========================
-   SUMMARY GENERATION
-========================= */
+// ========================================
+// SUMMARY GENERATION
+// ========================================
 exports.generateSummary = async (req, res) => {
   try {
     const { topic } = req.body;
@@ -78,42 +115,52 @@ exports.generateSummary = async (req, res) => {
       return res.status(400).json({ error: "Topic required" });
     }
 
-    const prompt = `Provide a concise, easy-to-understand summary of "${topic}" in 200-300 words. Focus on key concepts and important details.`;
+    const prompt = `Provide a concise, easy-to-understand summary of "${topic}" in 200-300 words. Focus on key concepts and important details that students should know.`;
 
-    const result = await model.generateContent(prompt);
-    const response = result.response.text();
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert educator who explains topics clearly and concisely."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: MODEL,
+      temperature: 0.6,
+      max_tokens: 800
+    });
 
-    res.status(200).json({ summary: response });
+    const summary = completion.choices[0].message.content;
+
+    res.status(200).json({ summary });
 
   } catch (err) {
     console.error("Summary Error:", err);
-    res.status(500).json({ error: "Failed to generate summary" });
+    res.status(500).json({ 
+      error: "Failed to generate summary: " + err.message 
+    });
   }
 };
 
 // ========================================
-// 1. GENERATE STUDY NOTES (Structured Output)
+// GENERATE STUDY NOTES
 // ========================================
 exports.generateStudyNotes = async (req, res) => {
   try {
     const { topic, difficulty } = req.body;
 
     if (!topic || !difficulty) {
-      return res.status(400).json({ message: "Topic and difficulty are required" });
+      return res.status(400).json({ 
+        message: "Topic and difficulty are required" 
+      });
     }
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 500,
-        topP: 0.8,
-      }
-    });
+    const prompt = `Generate concise study notes on "${topic}" at ${difficulty} difficulty level.
 
-    const prompt = `You are a Study Buddy AI. Generate concise study notes on the topic: "${topic}" at ${difficulty} difficulty level.
-
-Return ONLY valid JSON in this exact format (no markdown, no extra text):
+Return ONLY valid JSON in this exact format (no markdown):
 {
   "title": "Topic Name",
   "summary": "2-3 sentence overview",
@@ -121,19 +168,33 @@ Return ONLY valid JSON in this exact format (no markdown, no extra text):
   "examples": ["example 1", "example 2"]
 }`;
 
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text().trim();
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a study notes generator. Always respond with valid JSON only."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: MODEL,
+      temperature: 0.6,
+      max_tokens: 1000,
+      response_format: { type: "json_object" }
+    });
+
+    let text = completion.choices[0].message.content.trim();
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
     
-    // Clean up markdown code blocks if present
-    responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    
-    const parsedNotes = JSON.parse(responseText);
+    const notes = JSON.parse(text);
 
     res.json({
       success: true,
       topic,
       difficulty,
-      notes: parsedNotes
+      notes
     });
 
   } catch (error) {
@@ -147,63 +208,7 @@ Return ONLY valid JSON in this exact format (no markdown, no extra text):
 };
 
 // ========================================
-// 2. GENERATE QUIZ (Structured Output + Function Calling)
-// ========================================
-exports.generateQuiz = async (req, res) => {
-  try {
-    const { topic, difficulty, numQuestions = 5 } = req.body;
-
-    if (!topic || !difficulty) {
-      return res.status(400).json({ message: "Topic and difficulty are required" });
-    }
-
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 800,
-      }
-    });
-
-    const prompt = `You are a Study Buddy AI quiz generator. Create ${numQuestions} multiple-choice questions on "${topic}" at ${difficulty} difficulty.
-
-Return ONLY valid JSON in this exact format (no markdown):
-{
-  "quiz": [
-    {
-      "question": "Question text here?",
-      "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-      "correctAnswer": "A",
-      "explanation": "Why this is correct"
-    }
-  ]
-}`;
-
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text().trim();
-    responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    
-    const parsedQuiz = JSON.parse(responseText);
-
-    res.json({
-      success: true,
-      topic,
-      difficulty,
-      quiz: parsedQuiz.quiz
-    });
-
-  } catch (error) {
-    console.error("Error generating quiz:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Error generating quiz",
-      error: error.message 
-    });
-  }
-};
-
-// ========================================
-// 3. EXPLAIN ANSWER (Chain of Thought)
+// EXPLAIN ANSWER
 // ========================================
 exports.explainAnswer = async (req, res) => {
   try {
@@ -213,15 +218,7 @@ exports.explainAnswer = async (req, res) => {
       return res.status(400).json({ message: "Question is required" });
     }
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 400,
-      }
-    });
-
-    const prompt = `You are a Study Buddy AI. Explain the answer to this question step-by-step.
+    const prompt = `Explain the answer to this question step-by-step:
 
 Question: ${question}
 ${userAnswer ? `Student's Answer: ${userAnswer}` : ''}
@@ -234,12 +231,28 @@ Provide:
 
 Be concise and use simple language.`;
 
-    const result = await model.generateContent(prompt);
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a patient teacher who explains concepts step-by-step."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: MODEL,
+      temperature: 0.6,
+      max_tokens: 1000
+    });
+
+    const explanation = completion.choices[0].message.content;
 
     res.json({
       success: true,
       question,
-      explanation: result.response.text()
+      explanation
     });
 
   } catch (error) {
@@ -253,9 +266,10 @@ Be concise and use simple language.`;
 };
 
 // ========================================
-// 4. RAG - Retrieval Augmented Generation
+// RAG - Retrieval Augmented Generation
 // ========================================
-// Simple in-memory knowledge base (you can replace with vector DB later)
+
+// Simple in-memory knowledge base
 const knowledgeBase = [
   {
     id: 1,
@@ -276,16 +290,34 @@ const knowledgeBase = [
     id: 4,
     topic: "pythagorean theorem",
     content: "The Pythagorean theorem states that in a right triangle, the square of the hypotenuse equals the sum of squares of the other two sides: a² + b² = c². It's used to find distances, in construction, navigation, and computer graphics."
+  },
+  {
+    id: 5,
+    topic: "gravity",
+    content: "Gravity is a natural phenomenon by which objects with mass are attracted to one another. On Earth, gravity gives weight to physical objects and causes them to fall toward the ground when dropped. The gravitational force is described by Newton's law of universal gravitation: F = G(m1*m2)/r²."
   }
 ];
 
-// Simple keyword-based retrieval (you can upgrade to embeddings later)
+// Simple keyword-based retrieval
 function retrieveRelevantDocs(query, topK = 2) {
   const queryLower = query.toLowerCase();
   const scored = knowledgeBase.map(doc => {
-    const relevance = doc.topic.split(' ').filter(word => 
-      queryLower.includes(word)
-    ).length;
+    const topicWords = doc.topic.toLowerCase().split(' ');
+    const contentWords = doc.content.toLowerCase();
+    
+    let relevance = 0;
+    
+    // Check topic match
+    topicWords.forEach(word => {
+      if (queryLower.includes(word)) relevance += 3;
+    });
+    
+    // Check content match
+    const queryWords = queryLower.split(' ').filter(w => w.length > 3);
+    queryWords.forEach(word => {
+      if (contentWords.includes(word)) relevance += 1;
+    });
+    
     return { ...doc, relevance };
   });
   
@@ -307,26 +339,37 @@ exports.ragQuery = async (req, res) => {
     const relevantDocs = retrieveRelevantDocs(question);
 
     if (relevantDocs.length === 0) {
+      // No relevant docs found, use general knowledge
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful study assistant."
+          },
+          {
+            role: "user",
+            content: question
+          }
+        ],
+        model: MODEL,
+        temperature: 0.7,
+        max_tokens: 800
+      });
+
       return res.json({
         success: true,
         question,
-        answer: "I don't have specific information about that topic in my knowledge base. Let me try to answer based on my general knowledge.",
+        answer: completion.choices[0].message.content,
         sources: []
       });
     }
 
     // Step 2: Augment prompt with retrieved context
-    const context = relevantDocs.map(doc => doc.content).join('\n\n');
+    const context = relevantDocs.map(doc => 
+      `Topic: ${doc.topic}\n${doc.content}`
+    ).join('\n\n');
     
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.5,
-        maxOutputTokens: 400,
-      }
-    });
-
-    const prompt = `You are a Study Buddy AI. Use the following context to answer the question accurately.
+    const prompt = `Use the following context to answer the question accurately.
 
 Context:
 ${context}
@@ -339,13 +382,30 @@ Instructions:
 - Keep it concise and student-friendly
 - If the context doesn't fully answer the question, say so`;
 
-    const result = await model.generateContent(prompt);
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a study assistant that answers questions based on provided context."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: MODEL,
+      temperature: 0.5,
+      max_tokens: 800
+    });
 
     res.json({
       success: true,
       question,
-      answer: result.response.text(),
-      sources: relevantDocs.map(doc => ({ id: doc.id, topic: doc.topic }))
+      answer: completion.choices[0].message.content,
+      sources: relevantDocs.map(doc => ({ 
+        id: doc.id, 
+        topic: doc.topic 
+      }))
     });
 
   } catch (error) {
@@ -359,25 +419,19 @@ Instructions:
 };
 
 // ========================================
-// 5. COMPLETE STUDY SESSION (Combines everything)
+// CREATE STUDY SESSION
 // ========================================
 exports.createStudySession = async (req, res) => {
   try {
     const { topic, difficulty } = req.body;
 
     if (!topic || !difficulty) {
-      return res.status(400).json({ message: "Topic and difficulty are required" });
+      return res.status(400).json({ 
+        message: "Topic and difficulty are required" 
+      });
     }
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 1000,
-      }
-    });
-
-    const prompt = `You are a Study Buddy AI. Create a complete study session on "${topic}" at ${difficulty} level.
+    const prompt = `Create a complete study session on "${topic}" at ${difficulty} level.
 
 Return ONLY valid JSON (no markdown):
 {
@@ -396,11 +450,27 @@ Return ONLY valid JSON (no markdown):
   "studyTips": ["tip1", "tip2"]
 }`;
 
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text().trim();
-    responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a study session creator. Always respond with valid JSON only."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      model: MODEL,
+      temperature: 0.7,
+      max_tokens: 2000,
+      response_format: { type: "json_object" }
+    });
+
+    let text = completion.choices[0].message.content.trim();
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '');
     
-    const session = JSON.parse(responseText);
+    const session = JSON.parse(text);
 
     res.json({
       success: true,
