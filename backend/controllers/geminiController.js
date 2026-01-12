@@ -9,7 +9,7 @@ const {
   explainAnswer,
   ragQuery,
   createStudySession
-} = require("../controllers/groqController");
+} = require("../controllers/studyBuddyController");
 
 // Main routes
 router.post("/ask", askQuestion);
